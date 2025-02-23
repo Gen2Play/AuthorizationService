@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Gen2Play.AuthorizationService.model.dto.request.AccountRequestDTO;
@@ -50,8 +51,8 @@ public class AccountController {
     }
 
     @PreAuthorize("hasAnyAuthority('VIEW_PROFILE', 'ALL_ACCESS')")
-    @GetMapping("profile/{id}")
-    public ResponseDTO<?> getProfileById(@PathVariable UUID id) {
+    @GetMapping("profile")
+    public ResponseDTO<?> getProfileById(@RequestParam UUID id) {
         ResponseDTO<AccountResponseDTO> response = new ResponseDTO<>();
         try {
             AccountResponseDTO account = accountService.getAccountById(id);
