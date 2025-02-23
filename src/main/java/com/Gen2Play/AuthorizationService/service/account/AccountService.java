@@ -33,51 +33,10 @@ public class AccountService implements IAccountService {
     @Override
     public List<AccountResponseDTO> getAllAccount() {
         try {
-            Account acc = accountRepository.findById(Util.getAuthenticatedAccountId()).get();
-
-            List<Account> accountByRole = new ArrayList<>();
-            if (null == acc.getRole().getRoleCode()) {
-                List<Account> accounts = accountRepository.findAll();
-                for (Account account : accounts) {
-                    if (!account.getRole().getRoleCode().equals("ADMIN") && !account.getRole().getRoleCode().equals("EXAMINER")
-                            && !account.getRole().getRoleCode().equals("HEAD_OF_DEPARTMENT")) {
-                        accountByRole.add(account);
-                    }
-                }
-            } else {
-                switch (acc.getRole().getRoleCode()) {
-                    case "ADMIN" ->
-                        accountByRole = accountRepository.findAll();
-                    case "EXAMINER" -> {
-                        List<Account> accounts = accountRepository.findAll();
-                        for (Account account : accounts) {
-                            if (!account.getRole().getRoleCode().equals("ADMIN")) {
-                                accountByRole.add(account);
-                            }
-                        }
-                    }
-                    case "HEAD_OF_DEPARTMENT" -> {
-                        List<Account> accounts = accountRepository.findAll();
-                        for (Account account : accounts) {
-                            if (!account.getRole().getRoleCode().equals("ADMIN") && !account.getRole().getRoleCode().equals("EXAMINER")) {
-                                accountByRole.add(account);
-                            }
-                        }
-                    }
-                    default -> {
-                        List<Account> accounts = accountRepository.findAll();
-                        for (Account account : accounts) {
-                            if (!account.getRole().getRoleCode().equals("ADMIN") && !account.getRole().getRoleCode().equals("EXAMINER")
-                                    && !account.getRole().getRoleCode().equals("HEAD_OF_DEPARTMENT")) {
-                                accountByRole.add(account);
-                            }
-                        }
-                    }
-                }
-            }
+            List<Account> accounts = accountRepository.findAll();
 
             List<AccountResponseDTO> accountResponseDTOs = new ArrayList<>();
-            for (Account account : accountByRole) {
+            for (Account account : accounts) {
                 AccountResponseDTO accountResponseDTO = new AccountResponseDTO();
                 accountResponseDTO.setAccountId(account.getAccountId());
                 accountResponseDTO.setEmail(account.getEmail());

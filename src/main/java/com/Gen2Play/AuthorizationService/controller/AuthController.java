@@ -1,6 +1,5 @@
 package com.Gen2Play.AuthorizationService.controller;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,18 +36,18 @@ public class AuthController {
         try {
             if (email == null) {
                 responseDTO.setMessage(INVALID_EMAIL);
-                responseDTO.setStatus(HttpStatus.BAD_REQUEST);
+                responseDTO.setStatus(400);
             }
             SignInWithGoogleResponseDTO response = singInWithGoogleService.authenticateWithGoogle(email);
             responseDTO.setData(response);
-            responseDTO.setStatus(HttpStatus.OK);
+            responseDTO.setStatus(200);
             responseDTO.setMessage(SUCCESS);
         } catch (IllegalStateException e) {
             responseDTO.setMessage(NOT_FOUND);
-            responseDTO.setStatus(HttpStatus.NOT_FOUND);
+            responseDTO.setStatus(404);
         } catch (Exception e) {
             responseDTO.setMessage(ERROR);
-            responseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            responseDTO.setStatus(500);
         }
         return responseDTO;
     }
@@ -59,18 +58,18 @@ public class AuthController {
         try {
             if (signin.getEmail() == null || signin.getPassword() == null || signin.getEmail().trim().isEmpty() || signin.getPassword().trim().isEmpty()) {
                 responseDTO.setMessage(INVALID_EMAIL);
-                responseDTO.setStatus(HttpStatus.BAD_REQUEST);
+                responseDTO.setStatus(400);
             }
             SignInWithGoogleResponseDTO response = singInWithGoogleService.authenticateWithEmail(signin.getEmail(), signin.getPassword());
             responseDTO.setData(response);
-            responseDTO.setStatus(HttpStatus.OK);
+            responseDTO.setStatus(200);
             responseDTO.setMessage(SUCCESS);
         } catch (IllegalStateException e) {
             responseDTO.setMessage(NOT_FOUND);
-            responseDTO.setStatus(HttpStatus.NOT_FOUND);
+            responseDTO.setStatus(404);
         } catch (Exception e) {
             responseDTO.setMessage(ERROR);
-            responseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            responseDTO.setStatus(500);
         }
         return responseDTO;
     }
@@ -82,7 +81,7 @@ public class AuthController {
             responseDTO = verificationService.rotationToken(refreshToken);
         } catch (Exception e) {
             responseDTO.setMessage(ERROR);
-            responseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            responseDTO.setStatus(500);
         }
         return responseDTO;
     }

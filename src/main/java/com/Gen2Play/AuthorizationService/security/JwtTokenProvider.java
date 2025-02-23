@@ -3,21 +3,15 @@ package com.Gen2Play.AuthorizationService.security;
 import java.security.Key;
 import java.util.Date;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import java.util.UUID;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.InvalidKeyException;
 import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 @Component
 public class JwtTokenProvider {
@@ -26,67 +20,59 @@ public class JwtTokenProvider {
     private String jwtSecret;
 
     @Value("${jwt.access-token.expiration}")
-    private long jwtExpiration;
+    private long accessTokenExpiration;
+
+    @Value("${jwt.refresh-token.expiration}")
+    private long refreshTokenExpiration;
 
     private Key key;
 
-    private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
-
-    @PostConstruct
+    @jakarta.annotation.PostConstruct
     public void init() {
         this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
-    // Tạo JWT token
-    public String generateToken(String email, String role, Set<String> permissions) {
-       try {
-        Claims claims = Jwts.claims().setSubject(email);
-        claims.put("role", "ROLE_" + role);
-        claims.put("permissions", permissions);
+    // Tạo Access Token
+    public String generateAccessToken(UUID accountId, String role, Set<String> permissions) {
+        return generateToken(accountId, role, permissions, accessTokenExpiration);
+    }
+
+    // Tạo Refresh Token
+    public String generateRefreshToken(UUID accountId) {
+        return generateToken(accountId, null, null, refreshTokenExpiration);
+    }
+
+    // Tạo Token chung
+    private String generateToken(UUID accountId, String role, Set<String> permissions, long expirationTime) {
+        Claims claims = Jwts.claims().setSubject(accountId.toString());
+        if (role != null) claims.put("role", "ROLE_" + role);
+        if (permissions != null) claims.put("permissions", permissions);
 
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtExpiration);
+        Date expiryDate = new Date(now.getTime() + expirationTime);
 
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .signWith(key, SignatureAlgorithm.HS512)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
-       } catch (InvalidKeyException e) {
-            throw new IllegalStateException("Cannot create token: " + e.getMessage());
-       }
     }
 
-    // Xác minh JWT token và kiểm tra token có bị thu hồi không
-    public boolean validateToken(String token) throws ExpiredJwtException, MalformedJwtException, IllegalArgumentException, JwtException  {
-    
-        try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-            logger.info("JWT token is valid");
-            return true;
-        } catch (ExpiredJwtException e) {
-            logger.error("Expired JWT token: " + e.getMessage());
-            return false;
-        } catch (MalformedJwtException e) {
-            logger.error("Invalid JWT token: " + e.getMessage());
-            return false;
-        } catch (IllegalArgumentException e) {
-            logger.error("JWT claims string is empty: " + e.getMessage());
-            return false;
-        } catch (JwtException e) {
-            logger.error("Unexpected error during JWT validation: " + e.getMessage());
-            return false;
-        }
+    // Kiểm tra token hợp lệ
+    public boolean validateToken(String token) {
+        if (!StringUtils.hasText(token)) return false;
+        Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+        return true;
     }
-    
-    // Lấy email từ JWT token
-    public String getEmailFromJWT(String token) {
-        Claims claims = Jwts.parserBuilder()
-                            .setSigningKey(key)
-                            .build()
-                            .parseClaimsJws(token)
-                            .getBody();
-        return claims.getSubject();
-    }  
+
+    // Lấy email từ token
+    public String getEmailFromToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
 }

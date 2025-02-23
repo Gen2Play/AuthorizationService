@@ -3,7 +3,6 @@ package com.Gen2Play.AuthorizationService.service.authentication;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -85,18 +84,18 @@ public class VerificationService {
                             .collect(Collectors.toSet());
 
                     // Tạo access token mới
-                    String newAccessToken = jwtTokenProvider.generateToken(
-                            account.getEmail(),
+                    String newAccessToken = jwtTokenProvider.generateAccessToken(
+                            account.getAccountId(),
                             role.getRoleCode(),
                             permissions
                     );
                     
-                    Timestamp acessExpire = new Timestamp(Instant.now().plusMillis(getJwtAccessExpiration).toEpochMilli());
+                    Timestamp accessExpire = new Timestamp(Instant.now().plusMillis(getJwtAccessExpiration).toEpochMilli());
                     Timestamp refreshExpire = new Timestamp(Instant.now().plusMillis(getJwtRefreshExpiration).toEpochMilli());
 
                     // Tạo refresh token mới
                     OAuthRefreshToken newRefreshToken = new OAuthRefreshToken();
-                    newRefreshToken.setToken(UUID.randomUUID().toString());
+                    newRefreshToken.setToken(jwtTokenProvider.generateRefreshToken(account.getAccountId()));
                     newRefreshToken.setAccount(account);
                     newRefreshToken.setExpiryDate(refreshExpire);
                     refreshTokenRepository.save(newRefreshToken);
@@ -105,15 +104,15 @@ public class VerificationService {
                     ResponseDTO<TokenResponseDTO> response = new ResponseDTO<>();
                     TokenResponseDTO tokenResponseDTO = new TokenResponseDTO(newAccessToken,
                             newRefreshToken.getToken(),
-                            acessExpire.getTime());
+                            accessExpire.getTime());
                             response.setData(tokenResponseDTO);
-                            response.setStatus(HttpStatus.OK);
+                            response.setStatus(200);
                             response.setMessage("Get new token successfully.");
                     return response;
                 })
                 .orElseGet(() -> {
                     ResponseDTO<TokenResponseDTO> response = new ResponseDTO<>();
-                    response.setStatus(HttpStatus.FORBIDDEN);
+                    response.setStatus(403);
                     response.setMessage("Refresh token is invalid.");
                     return response;
                 });

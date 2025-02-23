@@ -1,0 +1,11 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${OAUTHEN2_CLIENT_ID}
+            client-secret: ${OAUTHEN2_CLIENT_SECRET}
+
+server:
+  port: 8081

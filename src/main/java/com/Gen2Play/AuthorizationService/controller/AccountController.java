@@ -3,7 +3,6 @@ package com.Gen2Play.AuthorizationService.controller;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -38,14 +37,14 @@ public class AccountController {
             List<AccountResponseDTO> accounts = accountService.getAllAccount();
             if (accounts.isEmpty()) {
                 response.setMessage("Fail to get all account");
-                response.setStatus(HttpStatus.NOT_FOUND);
+                response.setStatus(404);
             }
             response.setData(accounts);
             response.setMessage("Get all account successfully!");
-            response.setStatus(HttpStatus.OK);
+            response.setStatus(200);
         } catch (Exception e) {
             response.setMessage(ERROR);
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.setStatus(500);
         }
         return response;
     }
@@ -58,14 +57,14 @@ public class AccountController {
             AccountResponseDTO account = accountService.getAccountById(id);
             if (account == null) {
                 response.setMessage("Fail to get profile!");
-                response.setStatus(HttpStatus.NOT_FOUND);
+                response.setStatus(404);
             }
             response.setData(account);
             response.setMessage("Get profile successfully!");
-            response.setStatus(HttpStatus.OK);
+            response.setStatus(200);
         } catch (Exception e) {
             response.setMessage(ERROR);
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.setStatus(500);
         }
         return response;
     }
@@ -79,27 +78,27 @@ public class AccountController {
             switch (operationStatus) {
                 case SUCCESS -> {
                     response.setMessage("Update profile successfully!");
-                    response.setStatus(HttpStatus.OK);
+                    response.setStatus(200);
                 }
                 case ALREADY_EXISTS ->
                 {
                     response.setMessage("Account already exists!");
-                    response.setStatus(HttpStatus.CONFLICT);
+                    response.setStatus(409);
                 }
                 case FAILURE ->
                 {
                     response.setMessage("Fail to update profile!");
-                    response.setStatus(HttpStatus.BAD_REQUEST);
+                    response.setStatus(400);
                 }
                 default ->
                 {
                     response.setMessage(ERROR);
-                    response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+                    response.setStatus(500);
                 }
-            };
+            }
         } catch (Exception e) {
             response.setMessage(ERROR);
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.setStatus(500);
         }
         return response;
     }
@@ -115,27 +114,27 @@ public class AccountController {
                 case SUCCESS ->
                     {
                         response.setMessage("Create account successfully!");
-                        response.setStatus(HttpStatus.OK);
+                        response.setStatus(200);
                     }
                 case ALREADY_EXISTS ->
                     {
                         response.setMessage("Account already exists!");
-                        response.setStatus(HttpStatus.CONFLICT);
+                        response.setStatus(409);
                     }
                 case FAILURE ->
                     {
                         response.setMessage("Fail to create account!");
-                        response.setStatus(HttpStatus.BAD_REQUEST);
+                        response.setStatus(400);
                     }
                 default ->
                     {
                         response.setMessage(ERROR);
-                        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+                        response.setStatus(500);
                     }
-            };
+            }
         } catch (Exception e) {
             response.setMessage(ERROR);
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.setStatus(500);
         }
         return response;
     }
@@ -150,27 +149,27 @@ public class AccountController {
                 case SUCCESS ->
                     {
                         response.setMessage("Update account successfully!");
-                        response.setStatus(HttpStatus.OK);
+                        response.setStatus(200);
                     }
                 case ALREADY_EXISTS ->
                     {
                         response.setMessage("Account already exists!");
-                        response.setStatus(HttpStatus.CONFLICT);
+                        response.setStatus(409);
                     }
                 case FAILURE ->
                     {
                         response.setMessage("Fail to update account!");
-                        response.setStatus(HttpStatus.BAD_REQUEST);
+                        response.setStatus(400);
                     }
                 default ->
                     {
                         response.setMessage(ERROR);
-                        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+                        response.setStatus(500);
                     }
-            };
+            }
         } catch (Exception e) {
             response.setMessage(ERROR);
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.setStatus(500);
         }
         return response;
     }
@@ -185,17 +184,17 @@ public class AccountController {
                 case SUCCESS ->
                     {
                         response.setMessage("Delete account successfully!");
-                        response.setStatus(HttpStatus.OK);
+                        response.setStatus(200);
                     }
                 default ->
                     {
                         response.setMessage(ERROR);
-                        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+                        response.setStatus(500);
                     }
-            };
+            }
         } catch (Exception e) {
             response.setMessage(ERROR);
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.setStatus(500);
         }
         return response;
     }

@@ -47,10 +47,6 @@ public class SignInWithGoogleService implements ISingInWithGoogleService {
         return authenticate(account);
     }
 
-    private String generateRefreshToken() {
-        return UUID.randomUUID().toString();
-    }
-
     @Override
     public SignInWithGoogleResponseDTO authenticateWithEmail(String email, String password) {
         Account account = accountRepository.findByEmail(email)
@@ -82,8 +78,8 @@ public class SignInWithGoogleService implements ISingInWithGoogleService {
                     .collect(Collectors.toSet());
 
             // Tạo JWT token với role và permissions
-            String jwtToken = jwtTokenProvider.generateToken(
-                    account.getEmail(),
+            String jwtToken = jwtTokenProvider.generateAccessToken(
+                    account.getAccountId(),
                     roleName,
                     permissions
             );
@@ -93,7 +89,7 @@ public class SignInWithGoogleService implements ISingInWithGoogleService {
             Timestamp refreshExpire = new Timestamp(Instant.now().plusMillis(getJwtRefreshExpiration).toEpochMilli());
 
             // Tạo refresh token ngẫu nhiên
-            String refreshToken = generateRefreshToken();
+            String refreshToken = jwtTokenProvider.generateRefreshToken(account.getAccountId());
             // Lưu refresh token vào cơ sở dữ liệu
             OAuthRefreshToken oauthRefreshToken = new OAuthRefreshToken();
             oauthRefreshToken.setToken(refreshToken);
