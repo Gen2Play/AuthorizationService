@@ -12,9 +12,6 @@ spring:
 eureka:
   client:
     serviceUrl:
-      defaultZone: ${DISCOVERY_SERVICE_URI}
+      defaultZone: https://discovery.vothanhtuyen.id.vn:8761/eureka/
     registerWithEureka: true
     fetchRegistry: true
-
-server:
-  port: 8081
