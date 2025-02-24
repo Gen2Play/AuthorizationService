@@ -8,10 +8,3 @@ spring:
         initial-interval: 2000
   config:
     import: configserver:
-
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: https://discovery.vothanhtuyen.id.vn:8761/eureka/
-    registerWithEureka: true
-    fetchRegistry: true
